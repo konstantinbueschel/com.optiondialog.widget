@@ -1,22 +1,37 @@
 <Alloy>
-	<Window id="optionWindow" platform="ios">
+
+	<Window id="optionWindow" onClick="closeDialog" platform="ios">
+
 		<View id="optionWrapper" onClick="doClickOptionDialog">
+
 			<View id="optionTitleView">
-				<Label id="optionTitleLabel"></Label>
+
+				<Label id="optionTitleLabel" />
 				<Widget src="com.optiondialog.widget"  borderStyle="darkGrey" borderPos="bottom" name="borderView" id="borderView" />
+
 			</View>
-			<View id="optionRowsWrapper">
+
+			<View id="optionRowsWrapper" />
+
 			</View>
-		</View>
+
 	</Window>
-	<View id="optionWindow" platform="android">
+
+	<View id="optionWindow" onClick="closeDialog" platform="android">
+
 		<View id="optionWrapper" onClick="doClickOptionDialog">
+
 			<View id="optionTitleView">
-				<Label id="optionTitleLabel"></Label>
+
+				<Label id="optionTitleLabel" />
 				<Widget src="com.optiondialog.widget"  borderStyle="darkGrey" borderPos="bottom" name="borderView" id="borderView" />
+
 			</View>
-			<View id="optionRowsWrapper">
+
+			<View id="optionRowsWrapper" />
+
 			</View>
+
 		</View>
-	</View>
+
 </Alloy>

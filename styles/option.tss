@@ -1,40 +1,49 @@
-"Label" : {
+'Label' : {
 	touchEnabled: false
 }
 
-".optionRowView" : {
-	height: "42dp",
-	backgroundColor:"#f1f1f3",
+
+'Button': {
+
+	width: Ti.UI.FILL,
+	height: '42dp',
+
+	backgroundColor:'transparent',
+	backgroundSelectedColor: '#1a000000'
 }
 
-"#borderContainer":{
-   visible: false	
+
+'.optionRowView' : {
+	height: '43dp',
+	backgroundColor:'#f1f1f3'
 }
 
-/*
- * 
- */
-".selectedRowView" : {
-	height: "42dp",
-	backgroundColor:"#356765",
+
+'.selectedRowView' : {
+	height: '42dp',
+	backgroundColor:'#356765',
 }
 
-".cancelRowView" : {
-	height: "42dp",
-	backgroundColor:"#000000",
+
+'.cancelRowView' : {
+	height: '42dp',
+	backgroundColor:'#000000',
 }
 
-".optionLabel": {
-	color:"#cacaca",
-	font: { fontFamily: "Helvetica Neue", fontSize: "17dp"}
+
+'.optionLabel': {
+	color:'#cacaca',
+	font: { fontFamily: 'Helvetica Neue', fontSize: '17dp'}
 }
 
-".selectedLabel": {
-	color:"#ffffff",
-	font: { fontFamily: "Helvetica Neue", fontSize: "17dp"}
+
+'.selectedLabel': {
+	color:'#ffffff',
+	font: { fontFamily: 'Helvetica Neue', fontSize: '17dp'}
 }
 
-".cancelLabel": {
-	color:"#ffffff",
-	font: { fontFamily: "Helvetica Neue", fontSize: "17dp"}
+
+'.cancelLabel': {
+	color:'#ffffff',
+	font: { fontFamily: 'Helvetica Neue', fontSize: '17dp'}
 }

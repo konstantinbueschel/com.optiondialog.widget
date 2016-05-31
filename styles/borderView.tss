@@ -1,7 +1,8 @@
 
-".darkGrey" : {
+'.darkGrey' : {
    height: 1,
    width: Ti.UI.FILL,
-   backgroundColor: "#dadada",
+   backgroundColor: '#dadada',
    bottom: 0,
-}	
+   touchEnabled: false
+}

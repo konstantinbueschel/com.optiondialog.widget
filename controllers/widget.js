@@ -1,169 +1,269 @@
-var args = arguments[0] || {};
+var LTAG = '[com.optiondialog.widget]';
 
-var optionsVisible	=	false;
-var windowVisible	=	false;
-var options			= 	args.options;
-var cancel			= 	args.cancel;
-var optionTitle		= 	args.title;
-var showBorder		=	args.showBorder || false;
-var rowIndex		=	0;
-var selectedOption	=	null;
-var isOptionCreated	=	false;
-var settings		=	args.settings || {};
 
-settings.duration			=	settings.animationDuration || 500;
-settings.backgoundColorFrom	=	settings.backgoundColorFrom || "#4C000000";
-settings.backgoundColorTo	=	settings.backgoundColorTo || "#00000000";
-settings.delayClickEvent	=	settings.delayClickEvent || false;
-
-/*	Worker
+/**
+ * self-executing function to organize otherwise inline constructor code
  * 
+ * @param  {Object} args arguments passed to the controller
+ * @returns void
  */
-function createOptions(){
+(function constructor(args) {
 	
-	if(optionTitle){
-		$.optionTitleLabel.text	=	optionTitle;
-	}
+	$._optionsVisible = false;
+	$._windowVisible = false;
+	$._selectedOption = null;
+	$._isOptionCreated = false;
 	
-	for(rowIndex in options){
+	$._options = args.options;
 		
-		var optionView  = Widget.createController('option',{	optionNumber: rowIndex,
+	args.settings = args.settings || {};
+
+	$._openDuration = args.settings.openAnimationDuration || 500;
+	$._closeDuration = args.settings.closeAnimationDuration || args.settings.openDuration;
+	$._delayClickEvent = args.settings.delayClickEvent || false;
+
+// execute constructor with optional arguments passed to controller
+})($.args);
+
+
+function _createOptions() {
+
+	$.args.title && $.optionTitleLabel.setText($.args.title);
+
+	_.isArray($._options) && $._options.forEach(function(option, index, options) {
+
+		var optionView = Widget.createController('option', {
+
+			optionNumber: index,
 																selected: false,
-																showBorder: showBorder,
-																captionLabel: options[rowIndex],
-																rowType: selectedOption ==  options[rowIndex] ? "selected":"option"}).getView();
+			showBorder: !!$.args.showBorder && index !== (options.length - 1),
+			captionLabel: option,
+			rowType: $._selectedOption === option ? 'selected' : 'option'
 	
-	
+		}).getView();
+
 		$.optionRowsWrapper.add(optionView);
-	}
+	});
 	
-	if(cancel){
+	if ($.args.cancel) {
 		
-		var optionCancelView  = Widget.createController('option',{	optionNumber: Number( rowIndex ) + 1,
+		var optionCancelView = Widget.createController('option', {
+
+			optionNumber: _.isArray($._options) ? ($._options.length + 1) : 1,
 																	selected: false,
-																	captionLabel: cancel,
+			captionLabel: $.args.cancel,
 																	showBorder: false,
-																	rowType: "cancel"}).getView();
+			rowType: 'cancel'
 	
-	
+		}).getView();
+
 		$.optionRowsWrapper.add(optionCancelView);
 	}
-}
 
-function toggleOptions(args){
 	
-	args	=	args || {};
-	var completeAnimation	=	args.onCompleteAnimation || function(){};
-	var animation 			= 	Titanium.UI.createAnimation();
+	return;
 	
-	var animationHandler = function() {
-	  animation.removeEventListener('complete',animationHandler);
+} // END _createOptions()
 
-	  completeAnimation();
-	  optionsVisible = !optionsVisible;	
-	};
 
-	animation.addEventListener('complete',animationHandler);	
+function _toggleOptions(args) {
 	
-	if(!optionsVisible){
-		animation.bottom = 0;
-	}else{
-		animation.bottom = -$.optionWrapper.rect.height;
-	}
+	$.optionWrapper.animate({
 	
-	animation.duration = settings.duration;
-	$.optionWrapper.animate(animation);	
-}
+		bottom: ($._optionsVisible ? -$.optionWrapper.rect.height : 0),
+		duration: ($._optionsVisible ? $._closeDuration : $._openDuration)
 
-function toggleWindow(args){
+	}, function () {
 	
-	args	=	args || {};
-	var completeAnimation	=	args.onCompleteAnimation || function(){};
-	var animation 			= 	Titanium.UI.createAnimation();
+		$._optionsVisible = !$._optionsVisible;
 	
-	var animationHandler = function() {
-	  animation.removeEventListener('complete',animationHandler);
+		_.result(args, 'onCompleteAnimation');
 
-	  completeAnimation();
-	  windowVisible = !windowVisible;	
-	};
+		return;
+	});
 
-	animation.addEventListener('complete',animationHandler);	
-	
-	if(!windowVisible){
-		animation.backgroundColor	=	settings.backgoundColorFrom;
-	}else{
-		animation.backgroundColor	=	settings.backgoundColorTo;
-	}
-	
-	animation.duration = settings.duration;
-	$.optionWindow.animate(animation);	
-}
-//--------------------------------------------------------------------------
+} // END _toggleOptions()
 
-/* Exported functions
- * 
+	
+function _toggleWindow(args) {
+
+	var newOpacityValue = ($._windowVisible ? 0.0 : 1.0);
+
+	$.optionWindow.animate({
+
+		opacity: newOpacityValue,
+		duration: ($._windowVisible ? $._closeDuration : $._openDuration)
+
+	}, function () {
+
+		$.optionWindow.setOpacity(newOpacityValue);
+
+		$._windowVisible = !$._windowVisible;
+
+		_.result(args, 'onCompleteAnimation');
+
+		return;
+	});
+
+} // END _toggleWindow()
+
+
+/**
+ * Exported functions
  */
-function show(){
+function _show() {
 	
-	for (var d = $.optionRowsWrapper.children.length-1; d >= 0; d--) {
-	    $.optionRowsWrapper.remove($.optionRowsWrapper.children[d]);
-	}	
+	$.optionRowsWrapper.children.forEach(function (child) {
 	
-	!isOptionCreated && createOptions();
+		$.optionRowsWrapper.remove(child);
+	});
 
-	
-	if(OS_IOS ){
-		$.optionWindow.open();
+	$._isOptionCreated || _createOptions();
+
+	OS_IOS && $.optionWindow.open();
+
 		$.optionWrapper.bottom = - $.optionWrapper.rect.height;
-	}else if (OS_ANDROID){
-		$.optionWrapper.bottom = - $.optionWrapper.rect.height;
-		$.optionWindow.setVisible(true);
-	}
 	
+	OS_ANDROID && $.optionWindow.setVisible(true);
 
-	toggleOptions();
-	toggleWindow();
-}
+	_toggleOptions();
+	_toggleWindow();
 
-function setSelectedOption(option){
+	return;
 	
-	selectedOption	=	option;
-};
-//--------------------------------------------------------------------------
+} // END _show()
 
-function triggerClickEvent (e) {
+
+function _setSelectedOption(option) {
+
+	$._selectedOption = option;
+
+	return;
+
+} // END _setSelectedOption()
+
+
+function _triggerClickEvent(e) {
+
+	var optionsNum = Number(e.source.optionNumber);
+
 
 	$.trigger('click', {
 		
-		index: e.source.optionNumber,
-		source: e.source
+		index: optionsNum,
+		source: e.source,
+		cancel: !!($.args.cancel && optionsNum === options.length)
 	});  
+
+
+	return;
+
+} // END _triggerClickEvent()
+
+
+function closeDialog(event) {
+
+	var ghostClickEvent = {
+
+		index: -1,
+		source: $.optionWindow
+	};
+
+
+	if ($.args.cancel) {
+
+		ghostClickEvent.index = $._options.length;
+		ghostClickEvent.source = _.last($.optionRowsWrapper.getChildren());
 }
-/*	UI Eventlistener
- * 
+
+	ghostClickEvent.cancel = true;
+
+
+	_toggleWindow();
+	_toggleOptions({
+
+		onCompleteAnimation: function () {
+
+			OS_IOS && $.optionWindow.close();
+			OS_ANDROID && $.optionWindow.setVisible(false);
+
+			$._delayClickEvent && $.trigger('click', ghostClickEvent);
+
+			return;
+
+		} // END onCompleteAnimation()
+	});
+
+
+	$._delayClickEvent || $.trigger('click', ghostClickEvent);
+
+	return;
+
+} // END closeDialog()
+
+
+/**
+ * UI Eventlistener
  */
 function doClickOptionDialog (e) {
 	
-	e.source.options = options;
+	e.cancelBubble = true;
+	e.source.options = $._options;
 	 
-	toggleWindow();
-	toggleOptions({
+
+	_toggleWindow();
+	_toggleOptions({
+
 		onCompleteAnimation: function(){
-			if(OS_IOS ){
-				$.optionWindow.close();
-			}else if (OS_ANDROID){
-				$.optionWindow.setVisible(false);
-			}
 			
-			settings.delayClickEvent && triggerClickEvent(e);
+			OS_IOS && $.optionWindow.close();
+			OS_ANDROID && $.optionWindow.setVisible(false);
+
+			$._delayClickEvent && _triggerClickEvent(e);
+
+			return;
 		}
 	});	
 
-	!settings.delayClickEvent && triggerClickEvent(e);	
-}
-//--------------------------------------------------------------------------
 
-exports.setSelectedOption = setSelectedOption;
-exports.show = show;
-exports.options = options;
+	$._delayClickEvent || _triggerClickEvent(e);
+
+	return;
+
+} // END doClickOptionDialog()
+
+
+/**
+ * Sets new options
+ *
+ * @public
+ * @param {Dictionary[]} options
+ * @returns {*}
+ */
+function _setOptions(newOptions) {
+
+	_.isArray(newOptions) && ($._options = newOptions);
+
+	return $._options;
+
+} // END _setOptions()
+
+
+/**
+ * Get current options
+ *
+ * @public
+ * @returns {Dictionary{}}
+ */
+function _getOptions() {
+
+	return $._options;
+
+} // END _getOptions()
+
+
+// public interface
+exports.setOptions = _setOptions;
+exports.getOptions = _getOptions;
+exports.setSelectedOption = _setSelectedOption;
+exports.show = _show;
