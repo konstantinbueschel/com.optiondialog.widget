@@ -2,8 +2,9 @@ var LTAG = '[com.optiondialog.widget]';
 
 
 /**
- * self-executing function to organize otherwise inline constructor code
+ * SEF to organize otherwise inline constructor code
  * 
+ * @private
  * @param  {Object} args arguments passed to the controller
  * @returns void
  */
@@ -22,7 +23,6 @@ var LTAG = '[com.optiondialog.widget]';
 	$._closeDuration = args.settings.closeAnimationDuration || args.settings.openDuration;
 	$._delayClickEvent = args.settings.delayClickEvent || false;
 
-// execute constructor with optional arguments passed to controller
 })($.args);
 
 
